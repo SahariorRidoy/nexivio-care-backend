@@ -1,0 +1,335 @@
+// To use MongoDB instead of PostgreSQL:
+// 1. Change provider to "mongodb"
+// 2. Change DATABASE_URL to your MongoDB URI
+// 3. Replace @id @default(cuid()) with @id @default(auto()) @map("_id") @db.ObjectId
+// 4. Run: prisma db push (migrations are not supported in MongoDB mode)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  password        String
+  name            String
+  avatar          String?
+  avatarPublicId  String?
+  role            Role     @default(USER)
+  isVerified      Boolean  @default(false)
+  refreshToken    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// ─── Public content (managed by admin) ──────────────────────────────
+
+model Service {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  nameEn         String
+  nameBn         String
+  category       String?
+  shortDescEn    String?
+  shortDescBn    String?
+  descriptionEn  String?
+  descriptionBn  String?
+  image          String?
+  imagePublicId  String?
+  features       String[] @default([])
+  featuresEn     String[] @default([])
+  featuresBn     String[] @default([])
+  packages       Json?
+  isActive       Boolean  @default(true)
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("services")
+}
+
+model OtherService {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  nameEn         String
+  nameBn         String
+  shortDescEn    String?
+  shortDescBn    String?
+  descriptionEn  String?
+  descriptionBn  String?
+  image          String?
+  imagePublicId  String?
+  icon           String?
+  featuresEn     String[] @default([])
+  featuresBn     String[] @default([])
+  packages       Json?
+  isActive       Boolean  @default(true)
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("other_services")
+}
+
+model Training {
+  id                 String               @id @default(cuid())
+  slug               String               @unique
+  titleEn            String
+  titleBn            String
+  category           String?
+  descriptionEn      String?
+  descriptionBn      String?
+  image              String?
+  imagePublicId      String?
+  duration           String?
+  weeklyClasses      String?
+  totalHours         String?
+  fee                Float                @default(0)
+  classType          String               @default("offline")
+  syllabusEn         String[]             @default([])
+  syllabusBn         String[]             @default([])
+  syllabusModules    Json?
+  certificateInfoEn  String?
+  certificateInfoBn  String?
+  isActive           Boolean              @default(true)
+  order              Int                  @default(0)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  enrollments        TrainingEnrollment[]
+
+  @@map("training")
+}
+
+model TrainingEnrollment {
+  id           String   @id @default(cuid())
+  trainingId   String
+  training     Training @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+  name         String
+  phone        String
+  email        String?
+  address      String?
+  education    String?
+  message      String?
+  status       String   @default("pending")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("training_enrollments")
+}
+
+model Banner {
+  id             String   @id @default(cuid())
+  titleEn        String
+  titleBn        String
+  subtitleEn     String?
+  subtitleBn     String?
+  image          String
+  imagePublicId  String?
+  ctaLink        String?
+  type           String   @default("campaign")
+  isActive       Boolean  @default(true)
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("banners")
+}
+
+model Notice {
+  id             String   @id @default(cuid())
+  titleEn        String
+  titleBn        String
+  contentEn      String?
+  contentBn      String?
+  type           String   @default("general")
+  documentUrl    String?
+  documentPublicId String?
+  isActive       Boolean  @default(true)
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("notices")
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  customerName String
+  rating       Int      @default(5)
+  commentEn    String?
+  commentBn    String?
+  serviceUsed  String?
+  isApproved   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("reviews")
+}
+
+model GalleryItem {
+  id             String   @id @default(cuid())
+  type           String   @default("photo")
+  titleEn        String?
+  titleBn        String?
+  url            String
+  urlPublicId    String?
+  thumbnail      String?
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("gallery")
+}
+
+// ─── Submissions (created by public, managed by admin) ──────────────
+
+model Booking {
+  id            String   @id @default(cuid())
+  name          String
+  phone         String
+  address       String?
+  serviceType   String
+  packageName   String?
+  date          String?
+  time          String?
+  paymentMethod String?
+  amount        Float?
+  paymentStatus String   @default("unpaid")
+  transactionId String?
+  notes         String?
+  status        String   @default("pending")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("bookings")
+}
+
+model JobApplication {
+  id          String   @id @default(cuid())
+  name        String
+  phone       String
+  experience  String?
+  education   String?
+  cvUrl       String?
+  cvPublicId  String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("applications")
+}
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  nameEn      String
+  nameBn      String
+  roleEn      String?
+  roleBn      String?
+  image       String?
+  imagePublicId String?
+  bio         String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("team_members")
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contacts")
+}
+
+model Staff {
+  id             String   @id @default(cuid())
+  nameEn         String
+  nameBn         String
+  designationEn  String?
+  designationBn  String?
+  image          String?
+  imagePublicId  String?
+  pointsEn       String[] @default([])
+  pointsBn       String[] @default([])
+  order          Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("staff")
+}
+
+// ─── Site-wide settings (single row, managed by admin) ──────────────
+
+model SiteSetting {
+  id             String   @id @default("singleton")
+  // Contact information
+  phone          String?
+  whatsapp       String?
+  email          String?
+  address        String?
+  businessHours  String?
+  mapEmbedUrl    String?
+  // Social media links
+  facebookUrl    String?
+  youtubeUrl     String?
+  linkedinUrl    String?
+  instagramUrl   String?
+  messengerUrl   String?
+  // Branding / assets
+  logoUrl        String?
+  logoPublicId   String?
+  qrImageUrl     String?
+  qrPublicId     String?
+  // About-page content (optional, bilingual)
+  missionEn      String?
+  missionBn      String?
+  visionEn       String?
+  visionBn       String?
+  // bKash payment gateway credentials
+  bkashBaseUrl   String?  @default("https://tokenized.sandbox.bka.sh/v1.2.0-beta")
+  bkashAppKey    String?
+  bkashAppSecret String?
+  bkashUsername  String?
+  bkashPassword  String?
+  // SMS gateway (SSL Wireless)
+  smsApiKey      String?
+  smsSenderId    String?
+  updatedAt      DateTime @updatedAt
+  createdAt      DateTime @default(now())
+
+  @@map("site_settings")
+}
+
+model SmsLog {
+  id          String   @id @default(cuid())
+  to          String
+  message     String
+  status      String   @default("sent")   // sent | failed
+  response    String?
+  sentBy      String?
+  createdAt   DateTime @default(now())
+
+  @@map("sms_logs")
+}

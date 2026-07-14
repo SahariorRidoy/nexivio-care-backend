@@ -1,0 +1,46 @@
+import { Router } from 'express';
+import authRoutes from '../modules/auth/auth.routes';
+import userRoutes from '../modules/user/user.routes';
+import uploadRoutes from '../modules/upload/upload.routes';
+import adminRoutes from '../modules/admin/admin.routes';
+import serviceRoutes from '../modules/service/service.routes';
+import trainingRoutes from '../modules/training/training.routes';
+import bannerRoutes from '../modules/banner/banner.routes';
+import noticeRoutes from '../modules/notice/notice.routes';
+import galleryRoutes from '../modules/gallery/gallery.routes';
+import reviewRoutes from '../modules/review/review.routes';
+import bookingRoutes from '../modules/booking/booking.routes';
+import applicationRoutes from '../modules/application/application.routes';
+import contactRoutes from '../modules/contact/contact.routes';
+import settingsRoutes from '../modules/settings/settings.routes';
+import teamRoutes from '../modules/team/team.routes';
+import staffRoutes from '../modules/staff/staff.routes';
+import otherServiceRoutes from '../modules/other-service/other-service.routes';
+import trainingEnrollmentRoutes from '../modules/training-enrollment/training-enrollment.routes';
+import bkashRoutes from '../modules/bkash/bkash.routes';
+import smsRoutes from '../modules/sms/sms.routes';
+
+const router = Router();
+
+router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
+router.use('/uploads', uploadRoutes);
+router.use('/admin', adminRoutes);
+router.use('/services', serviceRoutes);
+router.use('/training', trainingRoutes);
+router.use('/banners', bannerRoutes);
+router.use('/notices', noticeRoutes);
+router.use('/gallery', galleryRoutes);
+router.use('/reviews', reviewRoutes);
+router.use('/bookings', bookingRoutes);
+router.use('/applications', applicationRoutes);
+router.use('/contacts', contactRoutes);
+router.use('/settings', settingsRoutes);
+router.use('/team', teamRoutes);
+router.use('/staff', staffRoutes);
+router.use('/other-services', otherServiceRoutes);
+router.use('/training-enrollments', trainingEnrollmentRoutes);
+router.use('/bkash', bkashRoutes);
+router.use('/sms', smsRoutes);
+
+export default router;

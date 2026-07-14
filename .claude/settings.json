@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -rf src/app/admin)",
+      "Bash(rm -f src/components/layout/AdminSidebar.tsx)",
+      "Bash(rm -f src/middleware.ts)",
+      "Bash(rm -f src/context/AuthContext.tsx)",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>console.log\\(JSON.parse\\(s\\).data.length\\)\\)\")"
+    ],
+    "additionalDirectories": [
+      "e:\\Projects\\Nexivio Care\\Nexivio Care Frontend\\src\\app",
+      "e:\\Projects\\Nexivio Care\\Nexivio Care Frontend\\src\\components\\layout",
+      "e:\\Projects\\Nexivio Care\\Nexivio Care Frontend",
+      "e:\\Projects\\Nexivio Care\\Nexivio Care Admin\\src\\app\\dashboard\\bookings"
+    ]
+  }
+}
