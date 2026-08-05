@@ -200,6 +200,9 @@ model Booking {
   name          String
   phone         String
   address       String?
+  patientName   String?
+  patientGender String?
+  relationship  String?
   serviceType   String
   packageName   String?
   date          String?
