@@ -10,8 +10,12 @@ const startServer = async (): Promise<void> => {
     await prisma.$connect();
     logger.info('PostgreSQL connected via Prisma');
 
-    await redis.connect();
-    logger.info('Redis connected');
+    try {
+      await redis.connect();
+      logger.info('Redis connected');
+    } catch (redisErr) {
+      logger.warn('Redis unavailable, continuing without cache:', redisErr);
+    }
 
     if (env.MONGODB_URI) {
       await connectMongoDB(env.MONGODB_URI);

@@ -2,10 +2,11 @@ import Redis from 'ioredis';
 import { env } from './env';
 
 export const redis = new Redis(env.REDIS_URL, {
-  retryStrategy: (times) => Math.min(times * 50, 2000),
-  maxRetriesPerRequest: 3,
+  retryStrategy: () => null, // don't retry — fail once and stay disconnected
+  maxRetriesPerRequest: null,
   lazyConnect: true,
+  enableOfflineQueue: false,
 });
 
 redis.on('connect', () => console.log('✅ Redis connected'));
-redis.on('error', (err) => console.error('❌ Redis error:', err.message));
+redis.on('error', () => {}); // suppress repeated error logs — handled at connect time

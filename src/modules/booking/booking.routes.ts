@@ -17,6 +17,7 @@ const createSchema = z.object({
   relationship: z.string().optional(),
   serviceType: z.string().min(1),
   packageName: z.string().optional(),
+  pricingPeriod: z.enum(['daily', 'weekly', 'monthly']).optional(),
   date: z.string().optional(),
   time: z.string().optional(),
   paymentMethod: z.string().optional(),

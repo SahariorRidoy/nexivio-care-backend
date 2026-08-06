@@ -205,6 +205,7 @@ model Booking {
   relationship  String?
   serviceType   String
   packageName   String?
+  pricingPeriod String?  // daily | weekly | monthly
   date          String?
   time          String?
   paymentMethod String?
