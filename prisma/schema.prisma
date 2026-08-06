@@ -337,3 +337,64 @@ model SmsLog {
 
   @@map("sms_logs")
 }
+
+// ─── Transportation ──────────────────────────────────────────────────────────
+
+model VehicleRegistration {
+  id              String   @id @default(cuid())
+  ownerName       String
+  ownerPhone      String
+  ownerEmail      String?
+  ownerAddress    String?
+  vehicleType     String   // ambulance | private-car | noah-hiace | microbus | suv-jeep | rent-a-car | pickup | truck | covered-van
+  vehicleBrand    String?
+  vehicleModel    String?
+  vehicleYear     String?
+  registrationNo  String?
+  seatingCapacity Int?
+  acAvailable     Boolean  @default(false)
+  driverIncluded  Boolean  @default(true)
+  serviceAreas    String[] @default([])
+  dailyRate       Float?
+  perKmRate       Float?
+  description     String?
+  imageUrl        String?
+  imagePublicId   String?
+  status          String   @default("pending")  // pending | approved | rejected
+  isActive        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  transportBookings TransportBooking[]
+
+  @@map("vehicle_registrations")
+}
+
+model TransportBooking {
+  id                  String               @id @default(cuid())
+  passengerName       String
+  passengerPhone      String
+  passengerEmail      String?
+  pickupAddress       String
+  dropAddress         String
+  vehicleType         String
+  serviceCategory     String?              // local-transport | intercity-transport | corporate-transport | airport-transfer | ambulance-service | goods-transportation | vehicle-rental
+  vehicleRegistrationId String?
+  vehicleRegistration VehicleRegistration? @relation(fields: [vehicleRegistrationId], references: [id])
+  tripType            String               @default("one-way")  // one-way | round-trip
+  scheduledDate       String
+  scheduledTime       String
+  passengerCount      Int                  @default(1)
+  luggageCount        Int                  @default(0)
+  specialRequirements String?
+  estimatedFare       Float?
+  paymentMethod       String?
+  paymentStatus       String               @default("unpaid")
+  transactionId       String?
+  status              String               @default("pending")  // pending | confirmed | in-progress | completed | cancelled
+  notes               String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@map("transport_bookings")
+}

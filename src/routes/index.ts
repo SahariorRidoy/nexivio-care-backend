@@ -19,6 +19,8 @@ import otherServiceRoutes from '../modules/other-service/other-service.routes';
 import trainingEnrollmentRoutes from '../modules/training-enrollment/training-enrollment.routes';
 import bkashRoutes from '../modules/bkash/bkash.routes';
 import smsRoutes from '../modules/sms/sms.routes';
+import vehicleRegistrationRoutes from '../modules/transportation/vehicle-registration.routes';
+import transportBookingRoutes from '../modules/transportation/transport-booking.routes';
 
 const router = Router();
 
@@ -42,5 +44,7 @@ router.use('/other-services', otherServiceRoutes);
 router.use('/training-enrollments', trainingEnrollmentRoutes);
 router.use('/bkash', bkashRoutes);
 router.use('/sms', smsRoutes);
+router.use('/vehicle-registrations', vehicleRegistrationRoutes);
+router.use('/transport-bookings', transportBookingRoutes);
 
 export default router;
