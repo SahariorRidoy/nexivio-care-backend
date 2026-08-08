@@ -18,6 +18,7 @@ const baseSchema = z.object({
   imagePublicId: z.string().optional(),
   pointsEn: z.array(z.string()).optional(),
   pointsBn: z.array(z.string()).optional(),
+  serviceId: z.string().optional().nullable(),
   order: z.number().int().optional(),
   isActive: z.boolean().optional(),
 });
@@ -25,9 +26,14 @@ const baseSchema = z.object({
 // ─── Public ───────────────────────────────────────────
 router.get(
   '/',
-  asyncHandler(async (_req, res) => {
+  asyncHandler(async (req, res) => {
+    const { serviceId } = req.query;
     const items = await prisma.staff.findMany({
-      where: { isActive: true },
+      where: {
+        isActive: true,
+        ...(serviceId ? { serviceId: String(serviceId) } : {}),
+      },
+      include: { service: { select: { id: true, nameEn: true, nameBn: true, slug: true } } },
       orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
     });
     sendSuccess(res, 'Staff fetched', items);
@@ -40,7 +46,10 @@ router.use(authenticate, authorize('ADMIN'));
 router.get(
   '/all',
   asyncHandler(async (_req, res) => {
-    const items = await prisma.staff.findMany({ orderBy: [{ order: 'asc' }, { createdAt: 'asc' }] });
+    const items = await prisma.staff.findMany({
+      include: { service: { select: { id: true, nameEn: true, nameBn: true, slug: true } } },
+      orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+    });
     sendSuccess(res, 'Staff fetched', items);
   })
 );
@@ -49,7 +58,10 @@ router.post(
   '/',
   asyncHandler(async (req, res) => {
     const data = baseSchema.parse(req.body);
-    const item = await prisma.staff.create({ data });
+    const item = await prisma.staff.create({
+      data,
+      include: { service: { select: { id: true, nameEn: true, nameBn: true, slug: true } } },
+    });
     sendSuccess(res, 'Staff created', item, 201);
   })
 );
@@ -58,7 +70,11 @@ router.patch(
   '/:id',
   asyncHandler(async (req, res) => {
     const data = baseSchema.partial().parse(req.body);
-    const item = await prisma.staff.update({ where: { id: req.params.id }, data });
+    const item = await prisma.staff.update({
+      where: { id: req.params.id },
+      data,
+      include: { service: { select: { id: true, nameEn: true, nameBn: true, slug: true } } },
+    });
     sendSuccess(res, 'Staff updated', item);
   })
 );

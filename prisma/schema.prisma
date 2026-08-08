@@ -56,6 +56,7 @@ model Service {
   order          Int      @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  staff          Staff[]
 
   @@map("services")
 }
@@ -236,18 +237,18 @@ model JobApplication {
 }
 
 model TeamMember {
-  id          String   @id @default(cuid())
-  nameEn      String
-  nameBn      String
-  roleEn      String?
-  roleBn      String?
-  image       String?
+  id            String   @id @default(cuid())
+  nameEn        String
+  nameBn        String
+  roleEn        String?
+  roleBn        String?
+  image         String?
   imagePublicId String?
-  bio         String?
-  order       Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  bio           String?
+  order         Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("team_members")
 }
@@ -276,6 +277,8 @@ model Staff {
   imagePublicId  String?
   pointsEn       String[] @default([])
   pointsBn       String[] @default([])
+  serviceId      String?
+  service        Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
   order          Int      @default(0)
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now())
