@@ -16,6 +16,8 @@ const packageSchema = z.object({
   tier: z.enum(['basic', 'standard', 'premium']),
   nameEn: z.string(),
   nameBn: z.string(),
+  descriptionEn: z.string().optional(),
+  descriptionBn: z.string().optional(),
   dutyHours: z.number(),
   dailyPrice: z.number(),
   weeklyPrice: z.number(),
