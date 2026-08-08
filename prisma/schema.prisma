@@ -197,7 +197,8 @@ model GalleryItem {
 // ─── Submissions (created by public, managed by admin) ──────────────
 
 model Booking {
-  id            String   @id @default(cuid())
+  id            String           @id @default(cuid())
+  receiptNumber String?          @unique
   name          String
   phone         String
   address       String?
@@ -206,19 +207,34 @@ model Booking {
   relationship  String?
   serviceType   String
   packageName   String?
-  pricingPeriod String?  // daily | weekly | monthly
+  pricingPeriod String?          // daily | weekly | monthly
   date          String?
   time          String?
   paymentMethod String?
   amount        Float?
-  paymentStatus String   @default("unpaid")
+  paymentStatus String           @default("unpaid")
   transactionId String?
   notes         String?
-  status        String   @default("pending")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status        String           @default("pending")
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  history       BookingHistory[]
 
   @@map("bookings")
+}
+
+model BookingHistory {
+  id         String   @id @default(cuid())
+  bookingId  String
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  field      String   // e.g. "status", "paymentStatus", "amount", "time", "date"
+  oldValue   String?
+  newValue   String?
+  changedBy  String?  // admin name/email
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@map("booking_history")
 }
 
 model JobApplication {
