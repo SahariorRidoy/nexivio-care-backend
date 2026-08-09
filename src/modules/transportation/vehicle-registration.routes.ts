@@ -5,12 +5,15 @@ import { authenticate, authorize } from '../../middlewares/auth.middleware';
 import { sendSuccess } from '../../utils/response.util';
 import { AppError } from '../../middlewares/error.middleware';
 import { asyncHandler } from '../../utils/async-handler';
+import { upload } from '../../middlewares/upload.middleware';
+import { saveImage } from '../../utils/storage.util';
 
 const router = Router();
 
 const createSchema = z.object({
   ownerName: z.string().min(1),
   ownerPhone: z.string().min(1),
+  ownerNid: z.string().optional(),
   ownerEmail: z.string().email().optional().or(z.literal('')),
   ownerAddress: z.string().optional(),
   vehicleType: z.string().min(1),
@@ -18,12 +21,12 @@ const createSchema = z.object({
   vehicleModel: z.string().optional(),
   vehicleYear: z.string().optional(),
   registrationNo: z.string().optional(),
-  seatingCapacity: z.number().int().positive().optional(),
-  acAvailable: z.boolean().optional(),
-  driverIncluded: z.boolean().optional(),
+  seatingCapacity: z.coerce.number().int().positive().optional(),
+  acAvailable: z.preprocess((v) => v === 'true' || v === true, z.boolean()).optional(),
+  driverIncluded: z.preprocess((v) => v === 'true' || v === true, z.boolean()).optional(),
   serviceAreas: z.array(z.string()).optional(),
-  dailyRate: z.number().positive().optional(),
-  perKmRate: z.number().positive().optional(),
+  dailyRate: z.coerce.number().positive().optional(),
+  perKmRate: z.coerce.number().positive().optional(),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
   imagePublicId: z.string().optional(),
@@ -32,8 +35,14 @@ const createSchema = z.object({
 // ─── Public: submit registration ─────────────────────────────────────────────
 router.post(
   '/',
+  upload.single('image'),
   asyncHandler(async (req, res) => {
     const data = createSchema.parse(req.body);
+    if (req.file) {
+      const stored = await saveImage(req.file.buffer, 'vehicles');
+      data.imageUrl = stored.url;
+      data.imagePublicId = stored.publicId;
+    }
     const item = await prisma.vehicleRegistration.create({ data });
     sendSuccess(res, 'Vehicle registration submitted', item, 201);
   })

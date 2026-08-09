@@ -364,6 +364,7 @@ model VehicleRegistration {
   id              String   @id @default(cuid())
   ownerName       String
   ownerPhone      String
+  ownerNid        String?
   ownerEmail      String?
   ownerAddress    String?
   vehicleType     String   // ambulance | private-car | noah-hiace | microbus | suv-jeep | rent-a-car | pickup | truck | covered-van
