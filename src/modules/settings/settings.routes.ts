@@ -12,6 +12,7 @@ const ns = z.string().nullish().transform((v) => v ?? undefined);
 
 const updateSchema = z.object({
   phone: ns,
+  phone2: ns,
   whatsapp: ns,
   email: ns,
   address: ns,

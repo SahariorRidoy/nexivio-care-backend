@@ -309,6 +309,7 @@ model SiteSetting {
   id             String   @id @default("singleton")
   // Contact information
   phone          String?
+  phone2         String?
   whatsapp       String?
   email          String?
   address        String?
