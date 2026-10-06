@@ -27,6 +27,8 @@ const updateSchema = z.object({
   logoPublicId: ns,
   qrImageUrl: ns,
   qrPublicId: ns,
+  visitingCardUrl: ns,
+  visitingCardPublicId: ns,
   missionEn: ns,
   missionBn: ns,
   visionEn: ns,
@@ -67,6 +69,9 @@ router.patch(
       }
       if (data.qrImageUrl && data.qrPublicId && existing.qrPublicId && existing.qrPublicId !== data.qrPublicId) {
         await deleteFile(existing.qrPublicId).catch(() => {});
+      }
+      if (data.visitingCardUrl && data.visitingCardPublicId && existing.visitingCardPublicId && existing.visitingCardPublicId !== data.visitingCardPublicId) {
+        await deleteFile(existing.visitingCardPublicId).catch(() => {});
       }
     }
 

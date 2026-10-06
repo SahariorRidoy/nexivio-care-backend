@@ -202,9 +202,10 @@ model Booking {
   name          String
   phone         String
   address       String?
-  patientName   String?
-  patientGender String?
-  relationship  String?
+  patientName      String?
+  patientGender    String?
+  relationship     String?
+  patientCondition String?
   serviceType   String
   packageName   String?
   pricingPeriod String?          // daily | weekly | monthly
@@ -245,6 +246,8 @@ model JobApplication {
   education   String?
   cvUrl       String?
   cvPublicId  String?
+  nidUrl      String?
+  nidPublicId String?
   status      String   @default("pending")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -324,8 +327,10 @@ model SiteSetting {
   // Branding / assets
   logoUrl        String?
   logoPublicId   String?
-  qrImageUrl     String?
-  qrPublicId     String?
+  qrImageUrl          String?
+  qrPublicId          String?
+  visitingCardUrl     String?
+  visitingCardPublicId String?
   // About-page content (optional, bilingual)
   missionEn      String?
   missionBn      String?
@@ -365,6 +370,8 @@ model VehicleRegistration {
   ownerName       String
   ownerPhone      String
   ownerNid        String?
+  ownerNidImageUrl String?
+  ownerNidPublicId String?
   ownerEmail      String?
   ownerAddress    String?
   vehicleType     String   // ambulance | private-car | noah-hiace | microbus | suv-jeep | rent-a-car | pickup | truck | covered-van

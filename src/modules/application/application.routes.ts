@@ -1,12 +1,21 @@
 import { Router } from 'express';
+import multer from 'multer';
 import { z } from 'zod';
 import { prisma } from '../../config/database';
 import { authenticate, authorize } from '../../middlewares/auth.middleware';
-import { uploadDocument } from '../../middlewares/upload.middleware';
 import { sendSuccess } from '../../utils/response.util';
 import { AppError } from '../../middlewares/error.middleware';
 import { asyncHandler } from '../../utils/async-handler';
-import { saveFile, deleteFile } from '../../utils/storage.util';
+import { saveFile, saveImage, deleteFile } from '../../utils/storage.util';
+import { env } from '../../config/env';
+
+const uploadFields = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: Math.max(env.MAX_FILE_SIZE_MB, env.MAX_IMAGE_SIZE_MB) * 1024 * 1024 },
+}).fields([
+  { name: 'cv', maxCount: 1 },
+  { name: 'nid', maxCount: 1 },
+]);
 
 const router = Router();
 
@@ -21,23 +30,35 @@ const createSchema = z.object({
 const STATUSES = ['pending', 'reviewed', 'shortlisted', 'hired', 'rejected'] as const;
 
 // ─── Public ──────────────────────────────────────────
-// Accepts multipart form-data with an optional `cv` PDF, plus text fields.
+// Accepts multipart form-data with optional `cv` (PDF) and `nid` (image) files.
 router.post(
   '/',
-  uploadDocument.single('cv'),
+  uploadFields,
   asyncHandler(async (req, res) => {
     const data = createSchema.parse(req.body);
+    const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+
     let cvUrl = data.cvUrl;
     let cvPublicId: string | undefined;
+    let nidUrl: string | undefined;
+    let nidPublicId: string | undefined;
 
-    if (req.file) {
-      const stored = await saveFile(req.file.buffer, req.file.originalname, 'applications');
+    const cvFile = files?.['cv']?.[0];
+    if (cvFile) {
+      const stored = await saveFile(cvFile.buffer, cvFile.originalname, 'applications');
       cvUrl = stored.url;
       cvPublicId = stored.publicId;
     }
 
+    const nidFile = files?.['nid']?.[0];
+    if (nidFile) {
+      const stored = await saveImage(nidFile.buffer, 'applications/nid');
+      nidUrl = stored.url;
+      nidPublicId = stored.publicId;
+    }
+
     const item = await prisma.jobApplication.create({
-      data: { ...data, cvUrl, cvPublicId },
+      data: { ...data, cvUrl, cvPublicId, nidUrl, nidPublicId },
     });
     sendSuccess(res, 'Application submitted', item, 201);
   })
@@ -72,6 +93,7 @@ router.delete(
     const existing = await prisma.jobApplication.findUnique({ where: { id: req.params.id } });
     if (!existing) throw new AppError('Application not found', 404);
     if (existing.cvPublicId) await deleteFile(existing.cvPublicId);
+    if (existing.nidPublicId) await deleteFile(existing.nidPublicId);
     await prisma.jobApplication.delete({ where: { id: req.params.id } });
     sendSuccess(res, 'Application deleted');
   })

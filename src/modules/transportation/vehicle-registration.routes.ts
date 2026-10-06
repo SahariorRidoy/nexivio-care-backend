@@ -14,6 +14,8 @@ const createSchema = z.object({
   ownerName: z.string().min(1),
   ownerPhone: z.string().min(1),
   ownerNid: z.string().optional(),
+  ownerNidImageUrl: z.string().optional(),
+  ownerNidPublicId: z.string().optional(),
   ownerEmail: z.string().email().optional().or(z.literal('')),
   ownerAddress: z.string().optional(),
   vehicleType: z.string().min(1),
@@ -35,13 +37,19 @@ const createSchema = z.object({
 // ─── Public: submit registration ─────────────────────────────────────────────
 router.post(
   '/',
-  upload.single('image'),
+  upload.fields([{ name: 'image', maxCount: 1 }, { name: 'nidImage', maxCount: 1 }]),
   asyncHandler(async (req, res) => {
     const data = createSchema.parse(req.body);
-    if (req.file) {
-      const stored = await saveImage(req.file.buffer, 'vehicles');
+    const files = req.files as Record<string, Express.Multer.File[]> | undefined;
+    if (files?.image?.[0]) {
+      const stored = await saveImage(files.image[0].buffer, 'vehicles');
       data.imageUrl = stored.url;
       data.imagePublicId = stored.publicId;
+    }
+    if (files?.nidImage?.[0]) {
+      const stored = await saveImage(files.nidImage[0].buffer, 'nids');
+      data.ownerNidImageUrl = stored.url;
+      data.ownerNidPublicId = stored.publicId;
     }
     const item = await prisma.vehicleRegistration.create({ data });
     sendSuccess(res, 'Vehicle registration submitted', item, 201);

@@ -15,6 +15,7 @@ const bookingSchema = z.object({
   patientName: z.string().optional(),
   patientGender: z.string().optional(),
   relationship: z.string().optional(),
+  patientCondition: z.string().optional(),
   serviceType: z.string().min(1),
   packageName: z.string().optional(),
   pricingPeriod: z.enum(['daily', 'weekly', 'monthly']).optional(),
@@ -100,6 +101,7 @@ router.patch(
       transactionId: z.string().optional(),
       notes: z.string().optional(),
       packageName: z.string().optional(),
+      patientCondition: z.string().optional(),
       changedBy: z.string().optional(),
       note: z.string().optional(),
     });
