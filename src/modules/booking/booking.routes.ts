@@ -34,9 +34,15 @@ const bookingSchema = z.object({
 const STATUSES = ['pending', 'confirmed', 'completed', 'cancelled'] as const;
 
 async function generateReceiptNumber(): Promise<string> {
-  const count = await prisma.booking.count();
   const year = new Date().getFullYear();
-  return `RCP-${year}-${String(count + 1).padStart(5, '0')}`;
+  const prefix = `RCP-${year}-`;
+  const last = await prisma.booking.findFirst({
+    where: { receiptNumber: { startsWith: prefix } },
+    orderBy: { receiptNumber: 'desc' },
+    select: { receiptNumber: true },
+  });
+  const lastNum = last?.receiptNumber ? parseInt(last.receiptNumber.split('-').pop() ?? '0', 10) : 0;
+  return `${prefix}${String(lastNum + 1).padStart(5, '0')}`;
 }
 
 // ─── Public: customer booking ────────────────────────
