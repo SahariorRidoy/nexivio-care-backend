@@ -81,6 +81,30 @@ router.get(
 router.use(authenticate, authorize('ADMIN'));
 
 router.get(
+  '/by-owner',
+  asyncHandler(async (_req, res) => {
+    const items = await prisma.vehicleRegistration.findMany({ orderBy: { createdAt: 'desc' } });
+    // Group by ownerPhone
+    const map = new Map<string, { ownerName: string; ownerPhone: string; ownerEmail?: string | null; ownerAddress?: string | null; ownerNidImageUrl?: string | null; vehicles: typeof items }>();
+    for (const item of items) {
+      const key = item.ownerPhone;
+      if (!map.has(key)) {
+        map.set(key, {
+          ownerName: item.ownerName,
+          ownerPhone: item.ownerPhone,
+          ownerEmail: item.ownerEmail,
+          ownerAddress: item.ownerAddress,
+          ownerNidImageUrl: item.ownerNidImageUrl,
+          vehicles: [],
+        });
+      }
+      map.get(key)!.vehicles.push(item);
+    }
+    sendSuccess(res, 'Owners fetched', Array.from(map.values()));
+  })
+);
+
+router.get(
   '/',
   asyncHandler(async (_req, res) => {
     const items = await prisma.vehicleRegistration.findMany({ orderBy: { createdAt: 'desc' } });

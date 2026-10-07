@@ -207,6 +207,8 @@ model Booking {
   relationship     String?
   patientCondition String?
   serviceType   String
+  dutyType      String?          // day | night | live-in
+  serviceDays   Int?             // number of days requested
   packageName   String?
   pricingPeriod String?          // daily | weekly | monthly
   date          String?

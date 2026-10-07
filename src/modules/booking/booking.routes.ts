@@ -17,6 +17,8 @@ const bookingSchema = z.object({
   relationship: z.string().optional(),
   patientCondition: z.string().optional(),
   serviceType: z.string().min(1),
+  dutyType: z.string().optional(),
+  serviceDays: z.number().int().positive().optional(),
   packageName: z.string().optional(),
   pricingPeriod: z.enum(['daily', 'weekly', 'monthly']).optional(),
   date: z.string().optional(),
