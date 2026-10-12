@@ -15,6 +15,7 @@ const uploadFields = multer({
 }).fields([
   { name: 'cv', maxCount: 1 },
   { name: 'nid', maxCount: 1 },
+  { name: 'experienceCert', maxCount: 1 },
 ]);
 
 const router = Router();
@@ -57,8 +58,17 @@ router.post(
       nidPublicId = stored.publicId;
     }
 
+    let experienceCertUrl: string | undefined;
+    let experienceCertPublicId: string | undefined;
+    const certFile = files?.['experienceCert']?.[0];
+    if (certFile) {
+      const stored = await saveImage(certFile.buffer, 'applications/cert');
+      experienceCertUrl = stored.url;
+      experienceCertPublicId = stored.publicId;
+    }
+
     const item = await prisma.jobApplication.create({
-      data: { ...data, cvUrl, cvPublicId, nidUrl, nidPublicId },
+      data: { ...data, cvUrl, cvPublicId, nidUrl, nidPublicId, experienceCertUrl, experienceCertPublicId },
     });
     sendSuccess(res, 'Application submitted', item, 201);
   })
@@ -94,6 +104,7 @@ router.delete(
     if (!existing) throw new AppError('Application not found', 404);
     if (existing.cvPublicId) await deleteFile(existing.cvPublicId);
     if (existing.nidPublicId) await deleteFile(existing.nidPublicId);
+    if (existing.experienceCertPublicId) await deleteFile(existing.experienceCertPublicId);
     await prisma.jobApplication.delete({ where: { id: req.params.id } });
     sendSuccess(res, 'Application deleted');
   })

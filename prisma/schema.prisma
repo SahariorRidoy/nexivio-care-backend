@@ -140,6 +140,7 @@ model Banner {
   imagePublicId  String?
   ctaLink        String?
   type           String   @default("campaign")
+  subtitleStyle  String   @default("static")
   isActive       Boolean  @default(true)
   order          Int      @default(0)
   createdAt      DateTime @default(now())
@@ -241,18 +242,20 @@ model BookingHistory {
 }
 
 model JobApplication {
-  id          String   @id @default(cuid())
-  name        String
-  phone       String
-  experience  String?
-  education   String?
-  cvUrl       String?
-  cvPublicId  String?
-  nidUrl      String?
-  nidPublicId String?
-  status      String   @default("pending")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                      String   @id @default(cuid())
+  name                    String
+  phone                   String
+  experience              String?
+  education               String?
+  cvUrl                   String?
+  cvPublicId              String?
+  nidUrl                  String?
+  nidPublicId             String?
+  experienceCertUrl       String?
+  experienceCertPublicId  String?
+  status                  String   @default("pending")
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   @@map("applications")
 }

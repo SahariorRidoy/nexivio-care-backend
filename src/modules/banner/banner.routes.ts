@@ -18,6 +18,7 @@ const baseSchema = z.object({
   imagePublicId: z.string().optional(),
   ctaLink: z.string().optional(),
   type: z.enum(['offer', 'campaign', 'training', 'service']).optional(),
+  subtitleStyle: z.enum(['static', 'marquee', 'typing']).optional(),
   isActive: z.boolean().optional(),
   order: z.number().int().optional(),
 });
