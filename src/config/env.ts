@@ -18,9 +18,6 @@ const envSchema = z.object({
   UPLOAD_DIR: z.string().default('uploads'),
   MAX_IMAGE_SIZE_MB: z.coerce.number().default(5),
   MAX_FILE_SIZE_MB: z.coerce.number().default(20),
-  CLOUDINARY_CLOUD_NAME: z.string(),
-  CLOUDINARY_API_KEY: z.string(),
-  CLOUDINARY_API_SECRET: z.string(),
 });
 
 const parsed = envSchema.safeParse(process.env);

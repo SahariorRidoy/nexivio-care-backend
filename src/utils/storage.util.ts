@@ -1,4 +1,7 @@
-import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import sharp from 'sharp';
 import { env } from '../config/env';
 
 export interface StoredFile {
@@ -6,57 +9,45 @@ export interface StoredFile {
   publicId: string;
 }
 
-cloudinary.config({
-  cloud_name: env.CLOUDINARY_CLOUD_NAME,
-  api_key: env.CLOUDINARY_API_KEY,
-  api_secret: env.CLOUDINARY_API_SECRET,
-});
+const UPLOAD_ROOT = path.resolve(env.UPLOAD_DIR ?? 'uploads');
 
-const uploadBuffer = (
-  buffer: Buffer,
-  folder: string,
-  options: object = {}
-): Promise<StoredFile> =>
-  new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      { folder: `nexivio-care/${folder}`, ...options },
-      (err, result) => {
-        if (err || !result) return reject(err ?? new Error('Cloudinary upload failed'));
-        resolve({ url: result.secure_url, publicId: result.public_id });
-      }
-    );
-    stream.end(buffer);
-  });
+const ensureDir = (dir: string): void => {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+};
 
-export const saveImage = (buffer: Buffer, folder: string): Promise<StoredFile> =>
-  uploadBuffer(buffer, folder, {
-    resource_type: 'image',
-    format: 'webp',
-    eager: [{ quality: 80, fetch_format: 'webp' }],
-    eager_async: false,
-  });
+const randomName = (): string => crypto.randomBytes(16).toString('hex');
 
-export const saveFile = (
-  buffer: Buffer,
-  _originalName: string,
-  folder: string
-): Promise<StoredFile> =>
-  uploadBuffer(buffer, folder, { resource_type: 'raw' });
+export const saveImage = async (buffer: Buffer, folder: string): Promise<StoredFile> => {
+  const dir = path.join(UPLOAD_ROOT, folder);
+  ensureDir(dir);
+  const filename = `${randomName()}.webp`;
+  await sharp(buffer).webp({ quality: 80 }).toFile(path.join(dir, filename));
+  const publicId = `${folder}/${filename}`;
+  return { url: `${env.APP_URL}/uploads/${publicId}`, publicId };
+};
 
-export const saveVideo = (
-  buffer: Buffer,
-  _originalName: string,
-  folder: string
-): Promise<StoredFile> =>
-  uploadBuffer(buffer, folder, { resource_type: 'video' });
+export const saveFile = async (buffer: Buffer, originalName: string, folder: string): Promise<StoredFile> => {
+  const dir = path.join(UPLOAD_ROOT, folder);
+  ensureDir(dir);
+  const filename = `${randomName()}${path.extname(originalName)}`;
+  fs.writeFileSync(path.join(dir, filename), buffer);
+  const publicId = `${folder}/${filename}`;
+  return { url: `${env.APP_URL}/uploads/${publicId}`, publicId };
+};
+
+export const saveVideo = async (buffer: Buffer, originalName: string, folder: string): Promise<StoredFile> => {
+  const dir = path.join(UPLOAD_ROOT, folder);
+  ensureDir(dir);
+  const filename = `${randomName()}${path.extname(originalName)}`;
+  fs.writeFileSync(path.join(dir, filename), buffer);
+  const publicId = `${folder}/${filename}`;
+  return { url: `${env.APP_URL}/uploads/${publicId}`, publicId };
+};
 
 export const deleteFile = async (publicId: string): Promise<void> => {
   if (!publicId) return;
-  for (const resource_type of ['image', 'video', 'raw'] as const) {
-    const res = await cloudinary.uploader.destroy(publicId, { resource_type });
-    if (res.result === 'ok') return;
-  }
+  const filePath = path.join(UPLOAD_ROOT, publicId);
+  if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
 };
 
-// UPLOAD_ROOT kept for any legacy references
-export const UPLOAD_ROOT = '/tmp/uploads';
+export const UPLOAD_ROOT_PATH = UPLOAD_ROOT;

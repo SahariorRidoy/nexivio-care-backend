@@ -19,7 +19,7 @@ const makeFilter =
     }
   };
 
-/** Image uploads — buffered in memory, then uploaded to Cloudinary. */
+/** Image uploads — buffered in memory, then saved to disk as WebP. */
 export const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: env.MAX_IMAGE_SIZE_MB * 1024 * 1024 },
@@ -30,7 +30,7 @@ export const upload = multer({
   ),
 });
 
-/** PDF / document uploads — buffered in memory, then uploaded to Cloudinary as raw. */
+/** PDF / document uploads — buffered in memory, then saved to disk. */
 export const uploadDocument = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: env.MAX_FILE_SIZE_MB * 1024 * 1024 },
@@ -41,7 +41,7 @@ export const uploadDocument = multer({
   ),
 });
 
-/** Video uploads — buffered in memory, then uploaded to Cloudinary as video. */
+/** Video uploads — buffered in memory, then saved to disk. */
 export const uploadVideo = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 200 * 1024 * 1024 },
