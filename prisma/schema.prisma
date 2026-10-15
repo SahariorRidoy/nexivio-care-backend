@@ -368,6 +368,51 @@ model SmsLog {
   @@map("sms_logs")
 }
 
+// ─── Standalone Receipts & Invoices ────────────────────────────────────────
+
+model StandaloneReceipt {
+  id              String   @id @default(cuid())
+  receiptNumber   String   @unique
+  date            String
+  receivedFrom    String
+  phone           String
+  address         String?
+  serviceType     String
+  paymentMethod   String
+  amount          Float
+  paidAmount      Float    @default(0)
+  paymentStatus   String   @default("unpaid")  // unpaid | partial | paid
+  transactionRef  String?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("standalone_receipts")
+}
+
+model StandaloneInvoice {
+  id            String                @id @default(cuid())
+  invoiceNumber String                @unique
+  invoiceDate   String
+  clientName    String
+  phone         String
+  email         String?
+  address       String
+  items         Json                  // InvoiceItem[]
+  subtotal      Float
+  discount      Float                 @default(0)
+  total         Float
+  paidAmount    Float                 @default(0)
+  paymentStatus String                @default("unpaid")  // unpaid | partial | paid
+  paymentMethod String?
+  transactionRef String?
+  notes         String?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@map("standalone_invoices")
+}
+
 // ─── Transportation ──────────────────────────────────────────────────────────
 
 model VehicleRegistration {

@@ -21,6 +21,8 @@ import bkashRoutes from '../modules/bkash/bkash.routes';
 import smsRoutes from '../modules/sms/sms.routes';
 import vehicleRegistrationRoutes from '../modules/transportation/vehicle-registration.routes';
 import transportBookingRoutes from '../modules/transportation/transport-booking.routes';
+import receiptRoutes from '../modules/receipt/receipt.routes';
+import invoiceRoutes from '../modules/invoice/invoice.routes';
 
 const router = Router();
 
@@ -46,5 +48,7 @@ router.use('/bkash', bkashRoutes);
 router.use('/sms', smsRoutes);
 router.use('/vehicle-registrations', vehicleRegistrationRoutes);
 router.use('/transport-bookings', transportBookingRoutes);
+router.use('/receipts', receiptRoutes);
+router.use('/invoices', invoiceRoutes);
 
 export default router;
