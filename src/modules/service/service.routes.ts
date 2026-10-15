@@ -48,6 +48,7 @@ router.get(
   '/',
   asyncHandler(async (_req, res) => {
     const items = await prisma.service.findMany({
+      where: { isActive: true },
       orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
     });
     // Migrate legacy `features` → `featuresEn` on the fly
