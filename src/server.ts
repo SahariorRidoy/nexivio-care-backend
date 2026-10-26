@@ -2,7 +2,6 @@ import app from './app';
 import { env } from './config/env';
 import { prisma } from './config/database';
 import { redis } from './config/redis';
-import { connectMongoDB, disconnectMongoDB } from './config/mongodb';
 import logger from './utils/logger';
 
 const startServer = async (): Promise<void> => {
@@ -17,10 +16,6 @@ const startServer = async (): Promise<void> => {
       logger.warn('Redis unavailable, continuing without cache:', redisErr);
     }
 
-    if (env.MONGODB_URI) {
-      await connectMongoDB(env.MONGODB_URI);
-    }
-
     const server = app.listen(Number(env.PORT), () => {
       logger.info(`Server running on port ${env.PORT} [${env.NODE_ENV}]`);
     });
@@ -30,7 +25,6 @@ const startServer = async (): Promise<void> => {
       server.close(async () => {
         await prisma.$disconnect();
         redis.disconnect();
-        if (env.MONGODB_URI) await disconnectMongoDB();
         process.exit(0);
       });
     };

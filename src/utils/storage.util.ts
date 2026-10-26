@@ -4,6 +4,8 @@ import crypto from 'crypto';
 import sharp from 'sharp';
 import { env } from '../config/env';
 
+sharp.concurrency(1);
+
 export interface StoredFile {
   url: string;
   publicId: string;
